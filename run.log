@@ -1,0 +1,20 @@
+exit=0
+
+    Directory: D:\a\Mine\Mine\ci\shots
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          11/15/2026 10:33 PM         477095 01-main.png
+-a---          11/15/2026 10:33 PM         124837 02-add-empty.png
+-a---          11/15/2026 10:33 PM         174152 03-add-filled.png
+-a---          11/15/2026 10:33 PM         173047 04-edit.png
+-a---          11/15/2026 10:33 PM         485252 05-menu-card.png
+-a---          11/15/2026 10:33 PM         488319 06-menu-bg.png
+-a---          11/15/2026 10:33 PM         260646 07-confirm.png
+-a---          11/15/2026 10:33 PM         463911 08-today.png
+-a---          11/15/2026 10:33 PM         377307 09-past-only.png
+-a---          11/15/2026 10:33 PM         408443 10-narrow.png
+-a---          11/15/2026 10:33 PM         183769 11-empty.png
+-a---          11/15/2026 10:33 PM            181 env.txt
+
+
