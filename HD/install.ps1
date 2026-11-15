@@ -3,6 +3,8 @@ $ErrorActionPreference = "Stop"
 $base = "https://raw.githubusercontent.com/Quanous/mine/main/HD"
 $dir  = Join-Path $env:APPDATA "HD\app"
 New-Item -ItemType Directory -Force $dir | Out-Null
+# 실행 중인 예전 HD 종료
+Get-CimInstance Win32_Process -Filter "Name='powershell.exe'" | Where-Object { $_.CommandLine -like "*HD.ps1*" } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
 foreach ($n in "HD.ps1", "icon.png", "icon.ico") {
     Invoke-WebRequest "$base/$n" -OutFile (Join-Path $dir $n) -UseBasicParsing
 }
