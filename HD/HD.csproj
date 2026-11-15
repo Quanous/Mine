@@ -19,6 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
     <Resource Include="Assets\hero.png" />
     <Resource Include="Assets\logo.png" />
