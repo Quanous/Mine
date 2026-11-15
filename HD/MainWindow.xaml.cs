@@ -102,10 +102,14 @@ namespace HD
         // ---------- 창 위치/크기 ----------
         void RestoreWindowBounds()
         {
+            // 작은 화면에서는 창이 화면 밖으로 넘치지 않게 높이를 줄임
+            double maxH = Math.Max(MinHeight, SystemParameters.WorkArea.Height - 16);
+            if (Height > maxH) Height = maxH;
+
             if (data.ww >= MinWidth && data.wh >= MinHeight)
             {
                 Width = data.ww;
-                Height = data.wh;
+                Height = Math.Min(data.wh, maxH);
                 double vl = SystemParameters.VirtualScreenLeft, vt = SystemParameters.VirtualScreenTop;
                 double vw = SystemParameters.VirtualScreenWidth, vh = SystemParameters.VirtualScreenHeight;
                 if (data.wx > vl - Width + 140 && data.wx < vl + vw - 140 && data.wy > vt - 10 && data.wy < vt + vh - 90)
@@ -175,6 +179,9 @@ namespace HD
 
             Closing += (s, e) => SaveWindowBounds();
             PreviewKeyDown += Window_PreviewKeyDown;
+
+            // 최대화는 막음 (투명한 그림자 여백까지 늘어나서 어색해짐)
+            StateChanged += (s, e) => { if (WindowState == WindowState.Maximized) WindowState = WindowState.Normal; };
 
             WireMenu();
             WireSheet();
@@ -315,9 +322,11 @@ namespace HD
             }
             else if (defaultArt != null)
             {
+                // 기본 아트: 좌우 반전해서 얼굴이 오른쪽(글자 반대편)에 오도록
                 ImageBrush b = MakeBrush(defaultArt);
                 b.ViewboxUnits = BrushMappingMode.RelativeToBoundingBox;
-                b.Viewbox = new Rect(0.04, 0.24, 0.92, 0.46);
+                b.Viewbox = new Rect(0.04, 0.20, 0.92, 0.54);
+                b.RelativeTransform = new ScaleTransform(-1, 1, 0.5, 0.5);
                 HeroBg.Background = b;
             }
         }

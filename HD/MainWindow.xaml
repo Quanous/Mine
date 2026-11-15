@@ -134,9 +134,9 @@
               <Border CornerRadius="24">
                 <Border.Background>
                   <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
-                    <GradientStop Color="#F20B0B0E" Offset="0"/>
-                    <GradientStop Color="#A00B0B0E" Offset="0.55"/>
-                    <GradientStop Color="#26000000" Offset="1"/>
+                    <GradientStop Color="#EC0B0B0E" Offset="0"/>
+                    <GradientStop Color="#880B0B0E" Offset="0.55"/>
+                    <GradientStop Color="#1E000000" Offset="1"/>
                   </LinearGradientBrush>
                 </Border.Background>
               </Border>
@@ -244,12 +244,12 @@
               <TextBlock Text="날짜" Style="{StaticResource FieldLabel}"/>
               <Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                  <TextBox x:Name="YearBox" Style="{StaticResource FieldCenter}" Width="74" MaxLength="4"/>
-                  <TextBlock Text="년" Style="{StaticResource Unit}"/>
-                  <TextBox x:Name="MonthBox" Style="{StaticResource FieldCenter}" Width="50" MaxLength="2"/>
-                  <TextBlock Text="월" Style="{StaticResource Unit}"/>
-                  <TextBox x:Name="DayBox" Style="{StaticResource FieldCenter}" Width="50" MaxLength="2"/>
-                  <TextBlock Text="일" Style="{StaticResource Unit}" Margin="7,0,0,0"/>
+                  <TextBox x:Name="YearBox" Style="{StaticResource FieldCenter}" Width="70" MaxLength="4"/>
+                  <TextBlock Text="년" Style="{StaticResource Unit}" Margin="6,0,9,0"/>
+                  <TextBox x:Name="MonthBox" Style="{StaticResource FieldCenter}" Width="46" MaxLength="2"/>
+                  <TextBlock Text="월" Style="{StaticResource Unit}" Margin="6,0,9,0"/>
+                  <TextBox x:Name="DayBox" Style="{StaticResource FieldCenter}" Width="46" MaxLength="2"/>
+                  <TextBlock Text="일" Style="{StaticResource Unit}" Margin="6,0,0,0"/>
                 </StackPanel>
                 <Button x:Name="BtnToday" Content="오늘" Style="{StaticResource GhostBtn}" Width="56" Height="42"
                         FontSize="13" HorizontalAlignment="Right"/>
