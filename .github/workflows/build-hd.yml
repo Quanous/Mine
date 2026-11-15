@@ -1,0 +1,26 @@
+name: build-hd
+on:
+  workflow_dispatch:
+  push:
+    paths: ["HD/**", ".github/workflows/build-hd.yml"]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install pyinstaller
+      - working-directory: HD
+        run: pyinstaller --noconsole --onefile --name HD --icon icon.ico --add-data "icon.png;." --add-data "icon.ico;." HD.pyw
+      - uses: actions/upload-artifact@v4
+        with: { name: HD-exe, path: HD/dist/HD.exe }
+      - name: Commit exe
+        shell: bash
+        run: |
+          mkdir -p release && cp HD/dist/HD.exe release/HD.exe
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git add -f release/HD.exe
+          git diff --cached --quiet || (git commit -m "Build HD.exe [skip ci]" && git push)
