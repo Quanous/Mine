@@ -1,0 +1,6 @@
+bin/
+obj/
+out/
+shots/
+*.user
+.vs/

@@ -1,26 +1,87 @@
 name: build-hd
+
 on:
-  workflow_dispatch:
   push:
+    branches-ignore: [ci-shots]
     paths: ["HD/**", ".github/workflows/build-hd.yml"]
+  workflow_dispatch:
+
 permissions:
   contents: write
+
+concurrency:
+  group: build-hd-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: "3.12" }
-      - run: pip install pyinstaller
-      - working-directory: HD
-        run: pyinstaller --noconsole --onefile --name HD --icon icon.ico --add-data "icon.png;." --add-data "icon.ico;." HD.pyw
-      - uses: actions/upload-artifact@v4
-        with: { name: HD-exe, path: HD/dist/HD.exe }
-      - name: Commit exe
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Build HD.exe
         shell: bash
         run: |
-          mkdir -p release && cp HD/dist/HD.exe release/HD.exe
-          git config user.name "github-actions"; git config user.email "actions@github.com"
-          git add -f release/HD.exe
-          git diff --cached --quiet || (git commit -m "Build HD.exe [skip ci]" && git push)
+          set +e
+          mkdir -p ci
+          dotnet build HD/HD.csproj -c Release -o out 2>&1 | tee ci/build.log
+          code=${PIPESTATUS[0]}
+          echo "BUILD_EXIT=$code" >> ci/build.log
+          exit $code
+
+      - name: Screenshots (demo mode)
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          New-Item -ItemType Directory ci/shots -Force | Out-Null
+          $exe = Join-Path $PWD "out/HD.exe"
+          $dir = Join-Path $PWD "ci/shots"
+          $p = Start-Process -FilePath $exe -ArgumentList "--demo","--shots","`"$dir`"" -PassThru
+          if (-not $p.WaitForExit(150000)) { $p.Kill(); "TIMEOUT" | Out-File (Join-Path $dir "timeout.txt") }
+          "exit=$($p.ExitCode)" | Out-File ci/run.log
+          Get-ChildItem $dir | Out-String | Out-File -Append ci/run.log
+
+      - name: Publish CI output to ci-shots branch
+        if: always()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          OUT="$RUNNER_TEMP/ciout"
+          rm -rf "$OUT"; mkdir -p "$OUT"
+          cp -r ci/. "$OUT/" 2>/dev/null
+          echo "commit=$GITHUB_SHA ref=$GITHUB_REF_NAME" > "$OUT/info.txt"
+          cd "$OUT"
+          git init -q
+          git checkout -q -b ci-shots
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -q -m "ci output for $GITHUB_SHA"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push -q -f origin ci-shots
+
+      - name: Upload exe artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HD-exe
+          path: out/HD.exe
+          if-no-files-found: ignore
+
+      - name: Publish release (main only)
+        if: github.ref == 'refs/heads/main' && success()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp out/HD.exe HD.exe
+          if gh release view latest >/dev/null 2>&1; then
+            gh release upload latest HD.exe --clobber
+          else
+            gh release create latest HD.exe --target "$GITHUB_SHA" --title "HD" --notes "HD.exe 최신 빌드" --latest
+          fi
