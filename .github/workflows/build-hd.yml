@@ -45,6 +45,12 @@ jobs:
           "exit=$($p.ExitCode)" | Out-File ci/run.log
           Get-ChildItem $dir | Out-String | Out-File -Append ci/run.log
 
+      - name: Verify the app started and rendered
+        shell: pwsh
+        run: |
+          if (Test-Path ci/shots/shots-error.txt) { Get-Content ci/shots/shots-error.txt; exit 1 }
+          if (-not (Test-Path ci/shots/11-empty.png)) { Write-Error "screenshots missing - app did not start"; exit 1 }
+
       - name: Publish CI output to ci-shots branch
         if: always()
         shell: bash
